@@ -8,7 +8,7 @@ opts_hash = {}
 optparse = OptionParser.new do|opts|
   opts.banner = "Usage: androidImageTool [options]"
   opts_hash[:path] = "."
-  opts.on( '-p', '--path', 'Path to image file' ) do |path|
+  opts.on('-p', '--path', 'Path to image file' ) do |path|
     opts_hash[:path] = path
   end
   opts.on( '-n', '--name', 'name of image file' ) do |name|
@@ -33,18 +33,18 @@ optparse = OptionParser.new do|opts|
     opts_hash[:dh] = dh
   end
 end
+optparse.parse!
 densities = {
     ldpi:24,
     mdpi:32,
     hdpi:48,
     xhdpi:64
 }
-=begin
 if(opts_hash[:name].nil?)
   puts opts_hash[:name]
   puts "Enter -n [file name]"
   exit
 end
-=end
-src = Image.new opts_hash[:path]+'/'+opts_hash[:name]
-puts src.to_s
+opts_hash.each do |arg|
+  puts arg
+end
