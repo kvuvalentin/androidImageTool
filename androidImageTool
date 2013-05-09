@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+#!encoding: UTF-8
+require 'optparse'
+require 'RMagick'
+include Magick
+
+opts_hash = {}
+optparse = OptionParser.new do|opts|
+  opts.banner = "Usage: androidImageTool [options]"
+  opts_hash[:path] = "."
+  opts.on( '-p', '--path', 'Path to image file' ) do |path|
+    opts_hash[:path] = path
+  end
+  opts.on( '-n', '--name', 'name of image file' ) do |name|
+    opts_hash[:name] = name
+  end
+  opts.on( '-w', '--width', 'New width of image' ) do |width|
+    opts_hash[:width] = width
+  end
+  opts.on( '-h', '--height', 'New height of image' ) do |height|
+    opts_hash[:height] = height
+  end
+  opts.on('--res_path', 'New height of image' ) do |res_path|
+    opts_hash[:path] = res_path
+  end
+  opts.on( '--dw', 'Delta width of image cut' ) do |dw|
+    opts_hash[:path] = dw
+  end
+  opts.on( '--dh', 'Delta height of image cut' ) do |dh|
+    opts_hash[:path] = dh
+  end
+end
+densities = {
+    ldpi:24,
+    mdpi:32,
+    hdpi:48,
+    xhdpi:64
+}
+
