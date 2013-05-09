@@ -22,8 +22,9 @@ optparse = OptionParser.new do|opts|
   opts.on( '-h', '--height', 'New height of image' ) do |height|
     opts_hash[:height] = height
   end
+  opts_hash[:res_path] = "."
   opts.on('--res_path', 'New height of image' ) do |res_path|
-    opts_hash[:path] = res_path
+    opts_hash[:res_path] = res_path
   end
   opts.on( '--dw', 'Delta width of image cut' ) do |dw|
     opts_hash[:dw] = dw
@@ -38,7 +39,12 @@ densities = {
     hdpi:48,
     xhdpi:64
 }
+=begin
 if(opts_hash[:name].nil?)
+  puts opts_hash[:name]
   puts "Enter -n [file name]"
   exit
 end
+=end
+src = Image.new opts_hash[:path]+'/'+opts_hash[:name]
+puts src.to_s
