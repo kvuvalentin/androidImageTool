@@ -14,9 +14,11 @@ optparse = OptionParser.new do|opts|
   opts.on( '-n', '--name', 'name of image file' ) do |name|
     opts_hash[:name] = name
   end
+  opts_hash[:height] = nil
   opts.on( '-w', '--width', 'New width of image' ) do |width|
     opts_hash[:width] = width
   end
+  opts_hash[:height] = nil
   opts.on( '-h', '--height', 'New height of image' ) do |height|
     opts_hash[:height] = height
   end
@@ -36,4 +38,8 @@ densities = {
     hdpi:48,
     xhdpi:64
 }
+if(opts_hash[:name].nil?)
+  puts "Enter -n [file name]"
+  exit
+end
 
