@@ -26,10 +26,10 @@ optparse = OptionParser.new do|opts|
     opts_hash[:path] = res_path
   end
   opts.on( '--dw', 'Delta width of image cut' ) do |dw|
-    opts_hash[:path] = dw
+    opts_hash[:dw] = dw
   end
   opts.on( '--dh', 'Delta height of image cut' ) do |dh|
-    opts_hash[:path] = dh
+    opts_hash[:dh] = dh
   end
 end
 densities = {
@@ -42,4 +42,3 @@ if(opts_hash[:name].nil?)
   puts "Enter -n [file name]"
   exit
 end
-
