@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-#!encoding: UTF-8
+
 require 'optparse'
 require 'RMagick'
 include Magick
@@ -40,9 +40,8 @@ if(opts_hash[:name].nil?)
   puts "Enter -n [file name]"
   exit
 end
+src = Magick::Image.read(opts_hash[:path]+'/'+opts_hash[:name])
 def default img
-  puts img.to_s
+  puts img.inspect
 end
-opts_hash.each do |arg|
-  puts arg
-end
+default src
