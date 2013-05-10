@@ -2,8 +2,9 @@
 
 require 'optparse'
 require 'RMagick'
+require 'fileutils'
 include Magick
-
+dpi_hash = {ldpi:24, mdpi:32,hdpi:48, xhdpi:64}
 opts_hash = {}
 optparse = OptionParser.new do|opts|
   opts.banner = "Usage: androidImageTool [options]"
@@ -34,14 +35,23 @@ optparse = OptionParser.new do|opts|
   end
 end
 optparse.parse!
-densities = { ldpi:24, mdpi:32,hdpi:48, xhdpi:64 }
+
 if(opts_hash[:name].nil?)
   puts opts_hash[:name]
   puts "Enter -n [file name]"
   exit
 end
-src = Magick::Image.read(opts_hash[:path]+'/'+opts_hash[:name])
-def default img
-  puts img.inspect
+src = Magick::Image.read(opts_hash[:path]+'/'+opts_hash[:name])[0]
+dSide = src.rows.to_f/src.columns.to_f
+puts dSide
+def default(img, dpi_hash, opts_hash, dSide)
+
+  dpi_hash.each do |path, dpi|
+    endPath = opts_hash[:res_path].to_s+"/"+path.to_s
+    unless File.exists? endPath or File.directory? endPath
+      FileUtils.mkdir endPath
+    end
+    img.resize(dpi.to_f, dpi.to_f*dSide).write(endPath+"/"+opts_hash[:name].to_s);
+  end
 end
-default src
+default(src, dpi_hash, opts_hash, dSide)
