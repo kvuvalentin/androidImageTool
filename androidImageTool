@@ -54,4 +54,17 @@ def default(img, dpi_hash, opts_hash, dSide)
     img.resize(dpi.to_f, dpi.to_f*dSide).write(endPath+"/"+opts_hash[:name].to_s);
   end
 end
+def cut(img, opts_hash)
+  newWidth = img.columns
+  newHeight = img.rows
+  unless(opts_hash[:dw].nil?)
+    newWidth -=opts_hash[:dw].to_i
+  end
+  unless(opts_hash[:dh].nil?)
+     newHeight -=opts_hash[:dh].to_i
+  end
+  endPath = opts_hash[:res_path].to_s+"/"+opts_hash[:name].to_s
+  img.resize(newWidth, newHeight).write(endPath)
+end
+
 default(src, dpi_hash, opts_hash, dSide)
