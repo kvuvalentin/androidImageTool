@@ -7,20 +7,29 @@ include Magick
 dpi_hash = {ldpi:24, mdpi:32,hdpi:48, xhdpi:64}
 opts_hash = {}
 optparse = OptionParser.new do|opts|
-  opts.banner = "Usage: androidImageTool [options]"
+  opts.banner = "Usage: androidImageTool path filename resources_path [options]"
   opts_hash[:width] = nil
   opts.on( '-w', '--width NUM', 'New width of image' ) do |width|
     opts_hash[:width] = width.to_f
   end
-  opts_hash[:height] = nil
-  opts.on( '-h', '--height NUM', 'New height of image' ) do |height|
-    opts_hash[:height] = height.to_f
+  opts_hash[:cut] = false
+  opts.on('-c', '--cut', 'Cut image') do |cut|
+    opts_hash[:cut] = true
   end
   opts.on( '--dw NUM', 'Delta width of image cut' ) do |dw|
-    opts_hash[:dw] = dw.to_f
+    if(opts_hash[:cut])
+      opts_hash[:dw] = dw.to_f
+    end
   end
   opts.on( '--dh NUM', 'Delta height of image cut' ) do |dh|
-    opts_hash[:dh] = dh.to_f
+    if(opts_hash[:cut])
+      opts_hash[:dh] = dh.to_f
+    end
+  end
+  opts.on('-h', '--help', 'Show this help') do |help|
+    puts opts
+    puts "Example:\n androidImageTool ~/images image.jpg ~/projects/MyAndroidProject/res\n"
+    exit
   end
 end
 optparse.parse!
