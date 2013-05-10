@@ -8,13 +8,6 @@ dpi_hash = {ldpi:24, mdpi:32,hdpi:48, xhdpi:64}
 opts_hash = {}
 optparse = OptionParser.new do|opts|
   opts.banner = "Usage: androidImageTool [options]"
-  opts_hash[:path] = "."
-  opts.on('-p', '--path FILE', 'Path to image file' ) do |path|
-    opts_hash[:path] = path.to_s
-  end
-  opts.on( '-n', '--name FILE', 'name of image file' ) do |name|
-    opts_hash[:name] = name.to_s
-  end
   opts_hash[:width] = nil
   opts.on( '-w', '--width NUM', 'New width of image' ) do |width|
     opts_hash[:width] = width.to_f
@@ -22,10 +15,6 @@ optparse = OptionParser.new do|opts|
   opts_hash[:height] = nil
   opts.on( '-h', '--height NUM', 'New height of image' ) do |height|
     opts_hash[:height] = height.to_f
-  end
-  opts_hash[:res_path] = "."
-  opts.on('--res_path FILE', 'New height of image' ) do |res_path|
-    opts_hash[:res_path] = res_path.to_s
   end
   opts.on( '--dw NUM', 'Delta width of image cut' ) do |dw|
     opts_hash[:dw] = dw.to_f
@@ -35,23 +24,20 @@ optparse = OptionParser.new do|opts|
   end
 end
 optparse.parse!
-
-if(opts_hash[:name].nil?)
-  puts opts_hash[:name]
-  puts "Enter -n [file name]"
-  exit
+ARGV.each do |opt|
+  puts opt.to_s
 end
-src = Magick::Image.read(opts_hash[:path]+'/'+opts_hash[:name])[0]
+
+src = Magick::Image.read(ARGV.at(0).to_s+"/"+ARGV.at(1))[0]
 dSide = src.rows.to_f/src.columns.to_f
 puts dSide
 def default(img, dpi_hash, opts_hash, dSide)
-
   dpi_hash.each do |path, dpi|
-    endPath = opts_hash[:res_path].to_s+"/"+path.to_s
+    endPath = ARGV.at(2).to_s+"/"+path.to_s
     unless File.exists? endPath or File.directory? endPath
       FileUtils.mkdir endPath
     end
-    img.resize(dpi.to_f, dpi.to_f*dSide).write(endPath+"/"+opts_hash[:name].to_s);
+    img.resize(dpi.to_f, dpi.to_f*dSide.to_f).write(endPath+"/"+ARGV.at(1));
   end
 end
 def cut(img, opts_hash)
@@ -66,5 +52,4 @@ def cut(img, opts_hash)
   endPath = opts_hash[:res_path].to_s+"/"+opts_hash[:name].to_s
   img.resize(newWidth, newHeight).write(endPath)
 end
-
 default(src, dpi_hash, opts_hash, dSide)
