@@ -3,6 +3,7 @@
 require 'optparse'
 require 'RMagick'
 require 'fileutils'
+require 'pathname'
 
 include Magick
 dpi_hash = {ldpi:24, mdpi:32,hdpi:64, xhdpi:128}
@@ -53,13 +54,18 @@ files.each do |file|
   src.from_blob blob
 end
 puts src
-def default(img, dpi_hash)
-  dpi_hash.each do |path, dpi|
-    endPath = ARGV.at(2).to_s+path.to_s
-    unless File.exists? endPath
-      FileUtils.mkdir endPath
+def default(img, dpi_hash, files)
+  files.each do |file|
+    dpi_hash.each do |path, dpi|
+      folder = ARGV.at(2).to_s+path.to_s
+      puts folder
+      endPath = folder+"/"+File.basename(file).to_s
+      puts 'Path: '+ endPath
+      unless File.exists? endPath or File.directory? endPath
+        FileUtils.mkdir folder
+      end
+      img.resize_to_fit(dpi.to_f, 0).write(endPath);
     end
-    img.resize_to_fit(dpi.to_f, 0).write(endPath);
   end
 end
 def cut(img, opts_hash)
@@ -79,7 +85,7 @@ def fit(img, opts_hash)
   img.resize_to_fit(opts_hash[:width], opts_hash[:height]).write(endPath)
 end
 if(opts_hash.length==0)
-  default(src, dpi_hash)
+  default(src, dpi_hash, files)
 elsif(opts_hash[:cut])
   cut(src, opts_hash)
 elsif(opts_hash[:fill])
