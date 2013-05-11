@@ -4,20 +4,21 @@ require 'optparse'
 require 'RMagick'
 require 'fileutils'
 include Magick
-dpi_hash = {ldpi:24, mdpi:32,hdpi:48, xhdpi:64}
+dpi_hash = {ldpi:24, mdpi:32,hdpi:64, xhdpi:128}
 opts_hash = {}
 optparse = OptionParser.new do|opts|
   opts.banner = "Usage: androidImageTool path filename resources_path [options]"
-  opts_hash[:width] = nil
+  opts.on('--cut', 'Cut image') do |cut|
+    opts_hash[:cut] = true
+  end
+  opts.on( '--fill', 'Fill image in size' ) do |dh|
+    opts_hash[:fill]=true
+  end
   opts.on( '-w', '--width NUM', 'New width of image' ) do |width|
     opts_hash[:width] = width.to_f
     end
   opts.on( '-h', '--height NUM', 'New height of image' ) do |height|
     opts_hash[:height] = height.to_f
-  end
-  opts_hash[:cut] = false
-  opts.on('-c', '--cut', 'Cut image') do |cut|
-    opts_hash[:cut] = true
   end
   opts.on( '--dw NUM', 'Delta width of image cut' ) do |dw|
     if(opts_hash[:cut])
@@ -28,10 +29,6 @@ optparse = OptionParser.new do|opts|
     if(opts_hash[:cut])
       opts_hash[:dh] = dh.to_f
     end
-  end
-  opts_hash[:fit] = false
-  opts.on( '--fit', 'Fit image in size' ) do |dh|
-    opts_hash[:fit]=true
   end
   opts.on('--help', 'Show this help') do |help|
     puts opts
@@ -44,15 +41,13 @@ ARGV.each do |opt|
   puts opt.to_s
 end
 src = Magick::Image.read(ARGV.at(0).to_s+"/"+ARGV.at(1))[0]
-dSide = src.rows.to_f/src.columns.to_f
-puts dSide
-def default(img, dpi_hash, opts_hash, dSide)
+def default(img, dpi_hash)
   dpi_hash.each do |path, dpi|
     endPath = ARGV.at(2).to_s+"/"+path.to_s
     unless File.exists? endPath or File.directory? endPath
       FileUtils.mkdir endPath
     end
-    img.resize(dpi.to_f, dpi.to_f*dSide.to_f).write(endPath+"/"+ARGV.at(1));
+    img.resize_to_fit(dpi.to_f, 0).write(endPath+"/"+ARGV.at(1));
   end
 end
 def cut(img, opts_hash)
@@ -72,9 +67,9 @@ def fit(img, opts_hash)
   img.resize_to_fit(opts_hash[:width], opts_hash[:height]).write(endPath)
 end
 if(opts_hash.length==0)
-  default(src, dpi_hash, opts_hash, dSide)
+  default(src, dpi_hash)
 elsif(opts_hash[:cut])
   cut(src, opts_hash)
-elsif(opts_hash[:fit])
+elsif(opts_hash[:fill])
   fit(src, opts_hash)
 end
