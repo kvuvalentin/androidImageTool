@@ -11,6 +11,9 @@ optparse = OptionParser.new do|opts|
   opts_hash[:width] = nil
   opts.on( '-w', '--width NUM', 'New width of image' ) do |width|
     opts_hash[:width] = width.to_f
+    end
+  opts.on( '-h', '--height NUM', 'New height of image' ) do |height|
+    opts_hash[:height] = height.to_f
   end
   opts_hash[:cut] = false
   opts.on('-c', '--cut', 'Cut image') do |cut|
@@ -26,7 +29,11 @@ optparse = OptionParser.new do|opts|
       opts_hash[:dh] = dh.to_f
     end
   end
-  opts.on('-h', '--help', 'Show this help') do |help|
+  opts_hash[:fit] = false
+  opts.on( '--fit', 'Fit image in size' ) do |dh|
+    opts_hash[:fit]=true
+  end
+  opts.on('--help', 'Show this help') do |help|
     puts opts
     puts "Example:\n androidImageTool ~/images image.jpg ~/projects/MyAndroidProject/res\n"
     exit
@@ -36,7 +43,6 @@ optparse.parse!
 ARGV.each do |opt|
   puts opt.to_s
 end
-
 src = Magick::Image.read(ARGV.at(0).to_s+"/"+ARGV.at(1))[0]
 dSide = src.rows.to_f/src.columns.to_f
 puts dSide
@@ -61,7 +67,14 @@ def cut(img, opts_hash)
   endPath = opts_hash[:res_path].to_s+"/"+opts_hash[:name].to_s
   img.resize(newWidth, newHeight).write(endPath)
 end
-def cut(img, opts_hash, dSide)
-   img.resize(img.columns-opts_hash[:dw].to_i, img.rows-opts_hash[:dh].to_i)
+def fit(img, opts_hash)
+  endPath = endPath = ARGV.at(2).to_s+"/"+ARGV.at(1)
+  img.resize_to_fit(opts_hash[:width], opts_hash[:height]).write(endPath)
 end
-default(src, dpi_hash, opts_hash, dSide)
+if(opts_hash.length==0)
+  default(src, dpi_hash, opts_hash, dSide)
+elsif(opts_hash[:cut])
+  cut(src, opts_hash)
+elsif(opts_hash[:fit])
+  fit(src, opts_hash)
+end
