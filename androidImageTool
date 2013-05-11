@@ -55,11 +55,11 @@ end
 puts src
 def default(img, dpi_hash)
   dpi_hash.each do |path, dpi|
-    endPath = ARGV.at(2).to_s+"/"+path.to_s
-    unless File.exists? endPath or File.directory? endPath
+    endPath = ARGV.at(2).to_s+path.to_s
+    unless File.exists? endPath
       FileUtils.mkdir endPath
     end
-    img.resize_to_fit(dpi.to_f, 0).write(endPath+"/"+ARGV.at(1));
+    img.resize_to_fit(dpi.to_f, 0).write(endPath);
   end
 end
 def cut(img, opts_hash)
