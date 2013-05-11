@@ -3,6 +3,7 @@
 require 'optparse'
 require 'RMagick'
 require 'fileutils'
+
 include Magick
 dpi_hash = {ldpi:24, mdpi:32,hdpi:64, xhdpi:128}
 opts_hash = {}
@@ -40,7 +41,18 @@ optparse.parse!
 ARGV.each do |opt|
   puts opt.to_s
 end
+=begin
 src = Magick::Image.read(ARGV.at(0).to_s+"/"+ARGV.at(1))[0]
+=end
+files = Dir[ARGV.at(0)]
+src = ImageList.new
+files.each do |file|
+  puts file
+  f = File.open file
+  blob = f.read
+  src.from_blob blob
+end
+puts src
 def default(img, dpi_hash)
   dpi_hash.each do |path, dpi|
     endPath = ARGV.at(2).to_s+"/"+path.to_s
