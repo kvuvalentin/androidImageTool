@@ -54,4 +54,7 @@ def default(img, dpi_hash, opts_hash, dSide)
     img.resize(dpi.to_f, dpi.to_f*dSide).write(endPath+"/"+opts_hash[:name].to_s);
   end
 end
+def cut(img, opts_hash, dSide)
+   img.resize(img.columns-opts_hash[:dw].to_i, img.rows-opts_hash[:dh].to_i)
+end
 default(src, dpi_hash, opts_hash, dSide)
