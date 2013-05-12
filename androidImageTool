@@ -22,7 +22,6 @@ optparse = OptionParser.new do|opts|
   opts.on( '-h', '--height NUM', 'New height of image' ) do |height|
     opts_hash[:height] = height.to_f
   end
-  opts_hash[:verbose] = false
   opts.on( '-v', '--verbose', 'Verbose mode' ) do |verbose|
     opts_hash[:verbose] = true
   end
@@ -84,6 +83,32 @@ def default(imageList, dpi_hash, opts_hash)
     i-=1
   end
 end
-if((opts_hash.length==1)&&(opts_hash[:verbose]))
+def cut(imageList, opts_hash)
+  files = ARGV.clone
+  files.pop
+  i = files.length-1
+  images = imageList.to_a
+  images.each do |img|
+    folder = ARGV.last
+    unless File.exists? folder or File.directory? folder
+      if opts_hash[:verbose]
+        puts "Creating directory "+folder
+      end
+      FileUtils.mkdir folder
+    end
+    tmp = img.resize_to_fill(img,columns-opts_hash[:dw], img.rows-opts_hash[:dh])
+    endfile = folder.to_s+"/"+File.basename(files[i].to_s)
+    if opts_hash[:verbose]
+      puts "Write file...\n"+endfile
+    end
+    tmp.write(endfile)
+    i-=1
+  end
+end
+if(opts_hash.empty?)
   default(src, dpi_hash, opts_hash)
+elsif((opts_hash.length==1)&&(opts_hash[:verbose]))
+  default(src, dpi_hash, opts_hash)
+elsif(opts_hash[:cut])
+  cut(src, opts_hash)
 end
