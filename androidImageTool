@@ -39,6 +39,9 @@ optparse = OptionParser.new do|opts|
   end
 end
 optparse.parse!
+if(ARGV.empty?)
+  exit
+end
 ARGV.each do |opt|
   puts opt.to_s
 end
