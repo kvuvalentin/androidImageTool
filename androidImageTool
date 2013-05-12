@@ -54,21 +54,19 @@ files.each do |file|
   src.from_blob blob
 end
 puts src
-def default(img, dpi_hash, files)
-  files.each do |file|
-    dpi_hash.each do |path, dpi|
-      folder = ARGV.at(2).to_s+path.to_s
-      puts folder
-      endPath = folder+"/"+File.basename(file).to_s
-      puts 'Path: '+ endPath
-      unless File.exists? endPath or File.directory? endPath
-        FileUtils.mkdir folder
-      end
-      img.resize_to_fit(dpi.to_f, 0).write(endPath);
+def default(img, dpi_hash, file)
+  dpi_hash.each do |path, dpi|
+    folder = ARGV.at(2).to_s+path.to_s
+    puts folder
+    endPath = folder+"/"+File.basename(file).to_s
+    puts 'Path: '+ endPath
+    unless File.exists? endPath or File.directory? endPath
+      FileUtils.mkdir folder
     end
+    img.resize_to_fit(dpi.to_f, 0).write(endPath);
   end
 end
-def cut(img, opts_hash)
+def cut(img, opts_hash, file)
   newWidth = img.columns
   newHeight = img.rows
   unless(opts_hash[:dw].nil?)
@@ -77,17 +75,19 @@ def cut(img, opts_hash)
   unless(opts_hash[:dh].nil?)
      newHeight -=opts_hash[:dh].to_i
   end
-  endPath = opts_hash[:res_path].to_s+"/"+opts_hash[:name].to_s
-  img.resize(newWidth, newHeight).write(endPath)
+  endPath = ARGV.at(2).to_s+"/"+File.basename(file).to_s
+  img.resize_to_fill(newWidth, newHeight).write(endPath)
 end
-def fit(img, opts_hash)
-  endPath = endPath = ARGV.at(2).to_s+"/"+ARGV.at(1)
-  img.resize_to_fit(opts_hash[:width], opts_hash[:height]).write(endPath)
+def fill(img, opts_hash, file)
+  endPath = endPath = ARGV.at(2).to_s+"/"+File.basename(file).to_s
+  img.resize_to_fill(opts_hash[:width], opts_hash[:height]).write(endPath)
 end
-if(opts_hash.length==0)
-  default(src, dpi_hash, files)
-elsif(opts_hash[:cut])
-  cut(src, opts_hash)
-elsif(opts_hash[:fill])
-  fit(src, opts_hash)
+files.each do |file|
+  if(opts_hash.length==0)
+    default(src, dpi_hash, file)
+  elsif(opts_hash[:cut])
+    cut(src, opts_hash, file)
+  elsif(opts_hash[:fill])
+    fill(src, opts_hash, file)
+  end
 end
