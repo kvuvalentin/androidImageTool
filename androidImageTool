@@ -18,12 +18,13 @@ optparse = OptionParser.new do|opts|
   end
   opts.on( '-w', '--width NUM', 'New width of image' ) do |width|
     opts_hash[:width] = width.to_f
-    end
+  end
   opts.on( '-h', '--height NUM', 'New height of image' ) do |height|
     opts_hash[:height] = height.to_f
-    end
+  end
+  opts_hash[:verbose] = false
   opts.on( '-v', '--verbose', 'Verbose mode' ) do |verbose|
-    opts_hash[:verbose] = verbose
+    opts_hash[:verbose] = true
   end
   opts.on( '--dw NUM', 'Delta width of image cut' ) do |dw|
     if(opts_hash[:cut])
@@ -45,12 +46,8 @@ optparse.parse!
 if(ARGV.empty?)
   exit
 end
-
-=begin
-src = Magick::Image.read(ARGV.at(0).to_s+"/"+ARGV.at(1))[0]
-=end
 if(opts_hash[:verbose])
-  puts "Create images..."
+  puts "Load images..."
 end
 src = ImageList.new
 ARGV.each do |file|
@@ -61,8 +58,6 @@ ARGV.each do |file|
     f = File.open file
     blob = f.read
     src.from_blob blob
-    puts file
-    puts src.inspect
   end
 end
 def default(imageList, dpi_hash, opts_hash)
@@ -80,11 +75,15 @@ def default(imageList, dpi_hash, opts_hash)
          FileUtils.mkdir folder
        end
        tmp = img.resize_to_fit(value, value)
-       puts tmp.inspect
-       puts files[i].to_s
-       tmp.write(folder.to_s+"/"+File.basename(files[i].to_s))
+       endfile = folder.to_s+"/"+File.basename(files[i].to_s)
+       if opts_hash[:verbose]
+         puts "Write file...\n"+endfile
+       end
+       tmp.write(endfile)
      end
     i-=1
   end
 end
-default(src, dpi_hash, opts_hash)
+if((opts_hash.length==1)&&(opts_hash[:verbose]))
+  default(src, dpi_hash, opts_hash)
+end
