@@ -60,9 +60,12 @@ ARGV.each do |file|
     f = File.open file
     blob = f.read
     src.from_blob blob
+    puts file
+    puts src.inspect
   end
 end
 
+=begin
 def default(img, dpi_hash, file, opts_hash)
   dpi_hash.each do |path, dpi|
     folder = ARGV.last.to_s+"/"+path.to_s
@@ -107,4 +110,4 @@ ARGV.each do |file|
       fill(src, opts_hash, file)
     end
   end
-end
+end=end
