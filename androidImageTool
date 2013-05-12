@@ -21,6 +21,9 @@ optparse = OptionParser.new do|opts|
     end
   opts.on( '-h', '--height NUM', 'New height of image' ) do |height|
     opts_hash[:height] = height.to_f
+    end
+  opts.on( '-v', '--verbose', 'Verbose mode' ) do |verbose|
+    opts_hash[:verbose] = verbose
   end
   opts.on( '--dw NUM', 'Delta width of image cut' ) do |dw|
     if(opts_hash[:cut])
@@ -42,27 +45,36 @@ optparse.parse!
 if(ARGV.empty?)
   exit
 end
-ARGV.each do |opt|
-  puts opt.to_s
-end
 =begin
 src = Magick::Image.read(ARGV.at(0).to_s+"/"+ARGV.at(1))[0]
 =end
+if(opts_hash[:verbose])
+  puts "Create images..."
+end
 src = ImageList.new
 ARGV.each do |file|
   if(ARGV.index(file)<ARGV.index(ARGV.last))
+    if(opts_hash[:verbose])
+      puts file
+    end
     f = File.open file
     blob = f.read
     src.from_blob blob
   end
 end
 
-def default(img, dpi_hash, file)
+def default(img, dpi_hash, file, opts_hash)
   dpi_hash.each do |path, dpi|
     folder = ARGV.last.to_s+"/"+path.to_s
     endPath = folder+"/"+File.basename(file).to_s
     unless File.exists? folder or File.directory? folder
+      if opts_hash[:verbose]
+         puts "Creating directory "+folder
+      end
       FileUtils.mkdir folder
+    end
+    if(opts_hash[:verbose])
+       puts "Write image to file "+endPath
     end
     img.resize_to_fit(dpi.to_f, 0).write(endPath);
   end
@@ -84,14 +96,15 @@ def fill(img, opts_hash, file)
   img.resize_to_fill(opts_hash[:width], opts_hash[:height]).write(endPath)
 end
 ARGV.each do |file|
-  if(ARGV.index file==ARGV.index(ARGV.last))
-    break
-  end
-  if(opts_hash.length==0)
-    default(src, dpi_hash, file)
-  elsif(opts_hash[:cut])
-    cut(src, opts_hash, file)
-  elsif(opts_hash[:fill])
-    fill(src, opts_hash, file)
+  unless(ARGV.index(file).to_i==ARGV.length-1)
+    if(opts_hash.length==0)
+      default(src, dpi_hash, file, opts_hash)
+    elsif(opts_hash[:verbose])
+      default(src, dpi_hash, file, opts_hash)
+    elsif(opts_hash[:cut])
+      cut(src, opts_hash, file)
+    elsif(opts_hash[:fill])
+      fill(src, opts_hash, file)
+    end
   end
 end
