@@ -45,22 +45,20 @@ end
 =begin
 src = Magick::Image.read(ARGV.at(0).to_s+"/"+ARGV.at(1))[0]
 =end
-files = Dir[ARGV.at(0)]
 src = ImageList.new
-files.each do |file|
-  puts file
-  f = File.open file
-  blob = f.read
-  src.from_blob blob
+ARGV.each do |file|
+  if(ARGV.index(file)<ARGV.index(ARGV.last))
+    f = File.open file
+    blob = f.read
+    src.from_blob blob
+  end
 end
-puts src
+
 def default(img, dpi_hash, file)
   dpi_hash.each do |path, dpi|
-    folder = ARGV.at(2).to_s+path.to_s
-    puts folder
+    folder = ARGV.last.to_s+"/"+path.to_s
     endPath = folder+"/"+File.basename(file).to_s
-    puts 'Path: '+ endPath
-    unless File.exists? endPath or File.directory? endPath
+    unless File.exists? folder or File.directory? folder
       FileUtils.mkdir folder
     end
     img.resize_to_fit(dpi.to_f, 0).write(endPath);
@@ -82,7 +80,10 @@ def fill(img, opts_hash, file)
   endPath = endPath = ARGV.at(2).to_s+"/"+File.basename(file).to_s
   img.resize_to_fill(opts_hash[:width], opts_hash[:height]).write(endPath)
 end
-files.each do |file|
+ARGV.each do |file|
+  if(ARGV.index file==ARGV.index(ARGV.last))
+    break
+  end
   if(opts_hash.length==0)
     default(src, dpi_hash, file)
   elsif(opts_hash[:cut])
