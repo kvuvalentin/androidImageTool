@@ -45,6 +45,7 @@ optparse.parse!
 if(ARGV.empty?)
   exit
 end
+
 =begin
 src = Magick::Image.read(ARGV.at(0).to_s+"/"+ARGV.at(1))[0]
 =end
@@ -64,50 +65,26 @@ ARGV.each do |file|
     puts src.inspect
   end
 end
-
-=begin
-def default(img, dpi_hash, file, opts_hash)
-  dpi_hash.each do |path, dpi|
-    folder = ARGV.last.to_s+"/"+path.to_s
-    endPath = folder+"/"+File.basename(file).to_s
-    unless File.exists? folder or File.directory? folder
-      if opts_hash[:verbose]
-         puts "Creating directory "+folder
-      end
-      FileUtils.mkdir folder
-    end
-    if(opts_hash[:verbose])
-       puts "Write image to file "+endPath
-    end
-    img.resize_to_fit(dpi.to_f, 0).write(endPath);
+def default(imageList, dpi_hash, opts_hash)
+  files = ARGV.clone
+  files.pop
+  i = files.length-1
+  images = imageList.to_a
+  images.each do |img|
+     dpi_hash.each do |key, value|
+       folder = ARGV.last+"/"+key.to_s
+       unless File.exists? folder or File.directory? folder
+         if opts_hash[:verbose]
+           puts "Creating directory "+folder
+         end
+         FileUtils.mkdir folder
+       end
+       tmp = img.resize_to_fit(value, value)
+       puts tmp.inspect
+       puts files[i].to_s
+       tmp.write(folder.to_s+"/"+File.basename(files[i].to_s))
+     end
+    i-=1
   end
 end
-def cut(img, opts_hash, file)
-  newWidth = img.columns
-  newHeight = img.rows
-  unless(opts_hash[:dw].nil?)
-    newWidth -=opts_hash[:dw].to_i
-  end
-  unless(opts_hash[:dh].nil?)
-     newHeight -=opts_hash[:dh].to_i
-  end
-  endPath = ARGV.at(2).to_s+"/"+File.basename(file).to_s
-  img.resize_to_fill(newWidth, newHeight).write(endPath)
-end
-def fill(img, opts_hash, file)
-  endPath = endPath = ARGV.at(2).to_s+"/"+File.basename(file).to_s
-  img.resize_to_fill(opts_hash[:width], opts_hash[:height]).write(endPath)
-end
-ARGV.each do |file|
-  unless(ARGV.index(file).to_i==ARGV.length-1)
-    if(opts_hash.length==0)
-      default(src, dpi_hash, file, opts_hash)
-    elsif(opts_hash[:verbose])
-      default(src, dpi_hash, file, opts_hash)
-    elsif(opts_hash[:cut])
-      cut(src, opts_hash, file)
-    elsif(opts_hash[:fill])
-      fill(src, opts_hash, file)
-    end
-  end
-end=end
+default(src, dpi_hash, opts_hash)
