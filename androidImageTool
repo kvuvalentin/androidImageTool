@@ -6,7 +6,7 @@ require 'fileutils'
 require 'pathname'
 
 include Magick
-dpi_hash = {ldpi:24, mdpi:32,hdpi:64, xhdpi:128}
+dpi_hash = {"drawable-ldpi"=>24, "drawable-mdpi"=>32,"drawable-hdpi"=>64, "drawable-xhdpi"=>128}
 opts_hash = {}
 optparse = OptionParser.new do|opts|
   opts.banner = "Usage: androidImageTool path filename resources_path [options]"
